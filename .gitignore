@@ -16,3 +16,12 @@ __pycache__/
 .env.local
 *.key
 *.pem
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/

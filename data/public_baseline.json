@@ -1,0 +1,16 @@
+{
+  "_fuentes": [
+    "Uptime Institute Annual Global Data Center Survey 2023",
+    "Gartner Data Center Stranded Capacity Report 2022",
+    "Lawrence Berkeley National Lab — United States Data Center Energy Usage Report"
+  ],
+  "_nota": "Distribución sintética basada en promedios de industria. Se reemplaza progresivamente con datos primarios via rebalanceo dinámico.",
+  "distribucion_por_dimension": {
+    "visibilidad_cross_layer":  { "media": 42.0, "std": 18.0 },
+    "atribucion_friccion":      { "media": 35.0, "std": 16.0 },
+    "latencia_coordinacion":    { "media": 38.0, "std": 17.0 },
+    "auto_cuantificacion":      { "media": 30.0, "std": 15.0 },
+    "bloqueantes":              { "media": 45.0, "std": 20.0 }
+  },
+  "distribucion_score_total": { "media": 38.0, "std": 15.0 }
+}
