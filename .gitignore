@@ -1,27 +1,46 @@
-# Entorno virtual de Python
+# ==========================================
+# ENTORNO VIRTUAL Y CACHÉ DE PYTHON
+# ==========================================
 venv/
 .venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.pytest_cache/
 
-# Base de datos local (tus pruebas con 60 pts no se subirán)
+# ==========================================
+# BASES DE DATOS LOCALES Y PRUEBAS DE API
+# ==========================================
 benchmark.db
 *.db
 *.sqlite3
+*.sqlite
+*.log
 
-# Archivos temporales de Python
-__pycache__/
-*.pyc
-
-# Variables de entorno y claves privadas (por si usan en el futuro)
+# ==========================================
+# VARIABLES DE ENTORNO Y SECRETOS
+# ==========================================
 .env
 .env.local
 *.key
 *.pem
-__pycache__/
-*.pyc
-*.pyo
-.env
-.venv/
-venv/
-*.egg-info/
-dist/
-.pytest_cache/
+
+# ==========================================
+# ARCHIVOS PERSONALES Y TEMPORALES DE OFFICE
+# ==========================================
+*.docx
+*.doc
+~$*
+*.tmp
+
+# ==========================================
+# CONFIGURACIÓN DE EDITORES Y SISTEMA
+# ==========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
