@@ -1,27 +1,27 @@
 {
   "visibilidad_cross_layer": {
-    "nombre_perfil": "Completar por Gio",
-    "descripcion_problema": "Completar por Gio — qué le pasa a este operador en esta dimensión",
-    "cuartil_superior": "Completar por Gio — qué hacen diferente los mejores operadores en esta dimensión"
+    "nombre_perfil": "El operador desconectado",
+    "descripcion_problema": "Tus equipos de cómputo y tus sistemas de climatización viven en mundos distintos. Estás gastando una fortuna en enfriar salas completas sin saber si los servidores realmente están trabajando o están completamente ociosos.",
+    "cuartil_superior": "Los operadores del cuartil superior cruzan datos de energía y carga de trabajo en una sola pantalla, ajustando el aire acondicionado automáticamente según la demanda real de cada servidor."
   },
   "atribucion_friccion": {
-    "nombre_perfil": "Completar por Gio",
-    "descripcion_problema": "Completar por Gio",
-    "cuartil_superior": "Completar por Gio"
+    "nombre_perfil": "El pagador silencioso",
+    "descripcion_problema": "Sabes perfectamente que la factura de luz es altísima y que hay energía tirada a la basura, pero te es imposible señalar con el dedo qué proyecto, cliente o servidor la está desperdiciando.",
+    "cuartil_superior": "Los operadores del cuartil superior rastrean el costo de la capacidad ociosa hasta el nivel de cada proyecto o workload, cobrando o asignando el gasto de energía exactamente a quien lo genera."
   },
   "latencia_coordinacion": {
-    "nombre_perfil": "Completar por Gio",
-    "descripcion_problema": "Completar por Gio",
-    "cuartil_superior": "Completar por Gio"
+    "nombre_perfil": "El apagafuegos",
+    "descripcion_problema": "Cada vez que se dispara la temperatura o hay que mover cargas de trabajo, todo se vuelve un caos de llamadas y ajustes manuales a las carreras mientras el riesgo de que algo falle sigue subiendo.",
+    "cuartil_superior": "Los operadores del cuartil superior usan reglas automáticas que reequilibran las tareas de cómputo en milisegundos ante un pico de calor, antes de que el edificio siquiera empiece a calentarse."
   },
   "auto_cuantificacion": {
-    "nombre_perfil": "Operador a Ciegas",
+    "nombre_perfil": "Operador a ciegas",
     "descripcion_problema": "Tu facility tiene capacidad ociosa pero no sabes exactamente cuánta ni por qué. Estás tomando decisiones de inversión sin los datos básicos para justificarlas.",
     "cuartil_superior": "Los operadores del cuartil superior miden su capacidad ociosa al menos una vez por semana y saben desglosarla por causa: over-provisioning, restricciones de cooling o workloads inactivos."
   },
   "bloqueantes": {
-    "nombre_perfil": "Completar por Gio",
-    "descripcion_problema": "Completar por Gio",
-    "cuartil_superior": "Completar por Gio"
+    "nombre_perfil": "El operador atado de manos",
+    "descripcion_problema": "Tienes toda la intención de hacer la operación más eficiente, pero te frenan las peleas entre departamentos, la burocracia interna o contratos viejos que no te dejan tocar nada.",
+    "cuartil_superior": "Los operadores del cuartil superior unificaron las metas de TI e instalaciones bajo los mismos incentivos y le dieron permiso al software para hacer ajustes automáticos sin pedir autorización previa."
   }
 }
