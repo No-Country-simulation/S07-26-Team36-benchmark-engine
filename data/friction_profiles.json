@@ -15,9 +15,9 @@
     "cuartil_superior": "Completar por Gio"
   },
   "auto_cuantificacion": {
-    "nombre_perfil": "Completar por Gio",
-    "descripcion_problema": "Completar por Gio",
-    "cuartil_superior": "Completar por Gio"
+    "nombre_perfil": "Operador a Ciegas",
+    "descripcion_problema": "Tu facility tiene capacidad ociosa pero no sabes exactamente cuánta ni por qué. Estás tomando decisiones de inversión sin los datos básicos para justificarlas.",
+    "cuartil_superior": "Los operadores del cuartil superior miden su capacidad ociosa al menos una vez por semana y saben desglosarla por causa: over-provisioning, restricciones de cooling o workloads inactivos."
   },
   "bloqueantes": {
     "nombre_perfil": "Completar por Gio",
