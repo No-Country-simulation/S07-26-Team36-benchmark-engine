@@ -1,0 +1,27 @@
+{
+  "visibilidad_cross_layer": {
+    "nombre_perfil": "Completar por Gio",
+    "descripcion_problema": "Completar por Gio — qué le pasa a este operador en esta dimensión",
+    "cuartil_superior": "Completar por Gio — qué hacen diferente los mejores operadores en esta dimensión"
+  },
+  "atribucion_friccion": {
+    "nombre_perfil": "Completar por Gio",
+    "descripcion_problema": "Completar por Gio",
+    "cuartil_superior": "Completar por Gio"
+  },
+  "latencia_coordinacion": {
+    "nombre_perfil": "Completar por Gio",
+    "descripcion_problema": "Completar por Gio",
+    "cuartil_superior": "Completar por Gio"
+  },
+  "auto_cuantificacion": {
+    "nombre_perfil": "Completar por Gio",
+    "descripcion_problema": "Completar por Gio",
+    "cuartil_superior": "Completar por Gio"
+  },
+  "bloqueantes": {
+    "nombre_perfil": "Completar por Gio",
+    "descripcion_problema": "Completar por Gio",
+    "cuartil_superior": "Completar por Gio"
+  }
+}
