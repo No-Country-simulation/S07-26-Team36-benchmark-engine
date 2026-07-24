@@ -1,146 +1,24 @@
 {
+  "_nota": "Escala 1-4 por pregunta. 1=menor madurez, 4=mayor madurez. Ponderaciones definidas por Gio.",
   "preguntas": {
-    "P1": {
-      "dimension": "visibilidad_cross_layer",
-      "texto": "¿Tiene su organización una vista unificada en tiempo real del consumo energético, temperatura de cooling y utilización de workloads?",
-      "opciones": {
-        "A": { "texto": "No, cada capa se monitorea por separado con herramientas distintas", "peso": 0 },
-        "B": { "texto": "Parcialmente, tenemos dashboards separados pero los revisamos juntos manualmente", "peso": 50 },
-        "C": { "texto": "Sí, tenemos una plataforma integrada que correlaciona las tres capas en tiempo real", "peso": 100 }
-      }
-    },
-    "P2": {
-      "dimension": "visibilidad_cross_layer",
-      "texto": "Cuando ocurre un evento anómalo en cooling (ej. temperatura elevada), ¿cuánto tiempo tarda su equipo en correlacionarlo con el estado del workload?",
-      "opciones": {
-        "A": { "texto": "Más de 30 minutos — requiere revisión manual de múltiples sistemas", "peso": 0 },
-        "B": { "texto": "Entre 5 y 30 minutos — hay alguna automatización pero no es completa", "peso": 50 },
-        "C": { "texto": "Menos de 5 minutos — el sistema lo correlaciona automáticamente y genera alertas", "peso": 100 }
-      }
-    },
-    "P3": {
-      "dimension": "visibilidad_cross_layer",
-      "texto": "¿Qué porcentaje de sus racks tienen visibilidad simultánea de energía (watts), temperatura (inlet/outlet) y utilización de cómputo?",
-      "opciones": {
-        "A": { "texto": "Menos del 30%", "peso": 0 },
-        "B": { "texto": "Entre el 30% y el 70%", "peso": 50 },
-        "C": { "texto": "Más del 70%", "peso": 100 }
-      }
-    },
-    "P4": {
-      "dimension": "atribucion_friccion",
-      "texto": "Cuando identifican capacidad stranded (encendida pero no productiva), ¿en qué capa ocurre con más frecuencia la pérdida?",
-      "opciones": {
-        "A": { "texto": "No sabemos con certeza en qué capa ocurre", "peso": 0 },
-        "B": { "texto": "Lo inferimos post-hoc revisando logs, pero no hay atribución sistemática", "peso": 50 },
-        "C": { "texto": "Tenemos atribución automática por capa con datos históricos", "peso": 100 }
-      }
-    },
-    "P5": {
-      "dimension": "atribucion_friccion",
-      "texto": "¿Pueden identificar qué interfaz entre capas (energía↔cooling, cooling↔cómputo, cómputo↔workload) genera más fricción operativa?",
-      "opciones": {
-        "A": { "texto": "No, no tenemos visibilidad de interfaces entre capas", "peso": 0 },
-        "B": { "texto": "Tenemos hipótesis basadas en experiencia del equipo, sin datos formales", "peso": 50 },
-        "C": { "texto": "Sí, tenemos métricas de fricción por interfaz y las revisamos regularmente", "peso": 100 }
-      }
-    },
-    "P6": {
-      "dimension": "atribucion_friccion",
-      "texto": "¿Con qué frecuencia realizan análisis formal de causa raíz cuando detectan capacidad stranded?",
-      "opciones": {
-        "A": { "texto": "Raramente o nunca — el foco está en resolver el síntoma", "peso": 0 },
-        "B": { "texto": "En incidentes graves solamente", "peso": 50 },
-        "C": { "texto": "Sistemáticamente, incluso en eventos menores", "peso": 100 }
-      }
-    },
-    "P7": {
-      "dimension": "latencia_coordinacion",
-      "texto": "Cuando un workload aumenta significativamente (ej. +40% de carga), ¿cuánto tiempo tarda el sistema de cooling en ajustarse?",
-      "opciones": {
-        "A": { "texto": "Más de 15 minutos — el ajuste es manual o semi-manual", "peso": 0 },
-        "B": { "texto": "Entre 5 y 15 minutos — hay automatización parcial", "peso": 50 },
-        "C": { "texto": "Menos de 5 minutos — el ajuste es automático y reactivo", "peso": 100 }
-      }
-    },
-    "P8": {
-      "dimension": "latencia_coordinacion",
-      "texto": "¿El sistema de energía (PDUs, UPS) se ajusta automáticamente ante cambios en la demanda de cómputo?",
-      "opciones": {
-        "A": { "texto": "No, los ajustes de energía son siempre manuales", "peso": 0 },
-        "B": { "texto": "Parcialmente, algunos componentes tienen ajuste automático", "peso": 50 },
-        "C": { "texto": "Sí, tenemos gestión dinámica de energía integrada con el estado del workload", "peso": 100 }
-      }
-    },
-    "P9": {
-      "dimension": "latencia_coordinacion",
-      "texto": "¿Tienen políticas de coordinación predefinidas (playbooks) que se activan automáticamente ante eventos de carga?",
-      "opciones": {
-        "A": { "texto": "No, cada evento se maneja ad hoc", "peso": 0 },
-        "B": { "texto": "Tenemos playbooks documentados pero la ejecución es manual", "peso": 50 },
-        "C": { "texto": "Sí, los playbooks se ejecutan automáticamente ante triggers definidos", "peso": 100 }
-      }
-    },
-    "P10": {
-      "dimension": "auto_cuantificacion",
-      "texto": "¿Sabe su organización cuánta capacidad stranded tiene actualmente, expresada en kW o en porcentaje de capacidad instalada?",
-      "opciones": {
-        "A": { "texto": "No tenemos esa métrica — no medimos stranded capacity formalmente", "peso": 0 },
-        "B": { "texto": "Tenemos estimaciones aproximadas basadas en datos parciales", "peso": 50 },
-        "C": { "texto": "Sí, tenemos la métrica actualizada y forma parte de nuestros KPIs operacionales", "peso": 100 }
-      }
-    },
-    "P11": {
-      "dimension": "auto_cuantificacion",
-      "texto": "¿Con qué frecuencia miden y reportan la utilización efectiva vs capacidad instalada?",
-      "opciones": {
-        "A": { "texto": "Anualmente o menos — durante auditorías", "peso": 0 },
-        "B": { "texto": "Mensualmente", "peso": 50 },
-        "C": { "texto": "Semanalmente o en tiempo real", "peso": 100 }
-      }
-    },
-    "P12": {
-      "dimension": "auto_cuantificacion",
-      "texto": "¿Pueden desglosar la stranded capacity por causa (over-provisioning, restricciones de cooling, workloads inactivos, etc.)?",
-      "opciones": {
-        "A": { "texto": "No, solo medimos el total si acaso", "peso": 0 },
-        "B": { "texto": "Identificamos 1 o 2 causas principales pero no tenemos desglose completo", "peso": 50 },
-        "C": { "texto": "Sí, tenemos desglose detallado por causa con datos históricos", "peso": 100 }
-      }
-    },
-    "P13": {
-      "dimension": "bloqueantes",
-      "texto": "Si mañana supieran exactamente dónde está su stranded capacity, ¿qué les impediría resolverlo?",
-      "opciones": {
-        "A": { "texto": "Falta de presupuesto o autorización para invertir en coordinación de capas", "peso": 33 },
-        "B": { "texto": "Falta de herramientas técnicas o integración entre sistemas existentes", "peso": 33 },
-        "C": { "texto": "Resistencia organizacional o falta de ownership claro entre equipos", "peso": 33 }
-      }
-    },
-    "P14": {
-      "dimension": "bloqueantes",
-      "texto": "¿Qué tan alineados están los equipos de infraestructura, operaciones y TI en torno a la gestión de capacidad?",
-      "opciones": {
-        "A": { "texto": "Poco alineados — cada equipo optimiza sus métricas por separado", "peso": 0 },
-        "B": { "texto": "Moderadamente — hay reuniones de coordinación pero sin métricas compartidas", "peso": 50 },
-        "C": { "texto": "Muy alineados — tienen OKRs compartidos y revisiones conjuntas frecuentes", "peso": 100 }
-      }
-    },
-    "P15": {
-      "dimension": "bloqueantes",
-      "texto": "¿Existe un responsable claro (persona o equipo) de optimizar la utilización total del facility?",
-      "opciones": {
-        "A": { "texto": "No, es una responsabilidad difusa entre varios equipos", "peso": 0 },
-        "B": { "texto": "Hay alguien que lo coordina informalmente pero sin autoridad formal", "peso": 50 },
-        "C": { "texto": "Sí, hay un rol o equipo con ownership explícito y métricas de éxito", "peso": 100 }
-      }
-    }
+    "P1":  { "dimension": "visibilidad_cross_layer" },
+    "P2":  { "dimension": "visibilidad_cross_layer" },
+    "P3":  { "dimension": "visibilidad_cross_layer" },
+    "P4":  { "dimension": "atribucion_friccion" },
+    "P5":  { "dimension": "atribucion_friccion" },
+    "P6":  { "dimension": "latencia_coordinacion" },
+    "P7":  { "dimension": "latencia_coordinacion" },
+    "P8":  { "dimension": "latencia_coordinacion" },
+    "P9":  { "dimension": "auto_cuantificacion" },
+    "P10": { "dimension": "auto_cuantificacion" },
+    "P11": { "dimension": "bloqueantes" },
+    "P12": { "dimension": "bloqueantes" }
   },
   "pesos_dimensiones": {
     "visibilidad_cross_layer": 0.25,
-    "atribucion_friccion": 0.20,
-    "latencia_coordinacion": 0.20,
-    "auto_cuantificacion": 0.20,
-    "bloqueantes": 0.15
+    "latencia_coordinacion":   0.25,
+    "atribucion_friccion":     0.20,
+    "auto_cuantificacion":     0.15,
+    "bloqueantes":             0.15
   }
 }

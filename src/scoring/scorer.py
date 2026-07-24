@@ -9,29 +9,37 @@ def load_config() -> dict:
         return json.load(f)
 
 
-def calculate_scores(respuestas: dict[str, str]) -> dict:
+def normalizar(valor: int) -> float:
+    """Convierte escala 1-4 a 0-100."""
+    return round((valor - 1) / 3 * 100, 2)
+
+
+def calculate_scores(respuestas: dict[str, int]) -> dict:
+    """
+    respuestas: {"P1": 3, "P2": 1, ...} — escala 1 a 4 por pregunta.
+    Devuelve scores 0-100 por dimensión y score total ponderado.
+    """
     config = load_config()
     preguntas = config["preguntas"]
     pesos_dimensiones = config["pesos_dimensiones"]
 
-    dimensiones = list(pesos_dimensiones.keys())
-    acumulado = {d: [] for d in dimensiones}
+    acumulado: dict[str, list[float]] = {d: [] for d in pesos_dimensiones}
 
-    for pregunta_id, opcion_elegida in respuestas.items():
+    for pregunta_id, opcion in respuestas.items():
         if pregunta_id not in preguntas:
             raise ValueError(f"Pregunta desconocida: {pregunta_id}")
-        pregunta = preguntas[pregunta_id]
-        if opcion_elegida not in pregunta["opciones"]:
-            raise ValueError(f"Opción inválida '{opcion_elegida}' para {pregunta_id}")
-        peso = pregunta["opciones"][opcion_elegida]["peso"]
-        acumulado[pregunta["dimension"]].append(peso)
+        if opcion not in (1, 2, 3, 4):
+            raise ValueError(f"Opción inválida '{opcion}' para {pregunta_id} — usar 1, 2, 3 o 4")
+        dimension = preguntas[pregunta_id]["dimension"]
+        acumulado[dimension].append(normalizar(opcion))
 
-    scores_por_dimension = {}
-    for dimension, pesos in acumulado.items():
-        scores_por_dimension[dimension] = round(sum(pesos) / len(pesos), 2) if pesos else 0.0
+    scores_por_dimension = {
+        d: round(sum(v) / len(v), 2) if v else 0.0
+        for d, v in acumulado.items()
+    }
 
     score_total = round(
-        sum(scores_por_dimension[d] * pesos_dimensiones[d] for d in dimensiones), 2
+        sum(scores_por_dimension[d] * pesos_dimensiones[d] for d in pesos_dimensiones), 2
     )
 
     return {
