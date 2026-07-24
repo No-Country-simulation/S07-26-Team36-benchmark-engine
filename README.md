@@ -116,9 +116,9 @@ API disponible en `http://localhost:8000/docs`
 
 | Recurso | URL |
 |---------|-----|
-| API base | https://s07-26-team36-benchmark-engine-565u.onrender.com |
+| **Formulario web** | https://s07-26-team36-benchmark-engine-565u.onrender.com |
 | Documentación interactiva | https://s07-26-team36-benchmark-engine-565u.onrender.com/docs |
-| Enviar benchmark | `POST` https://s07-26-team36-benchmark-engine-565u.onrender.com/api/v1/submit |
+| Enviar benchmark (API) | `POST` https://s07-26-team36-benchmark-engine-565u.onrender.com/api/v1/submit |
 | Reporte PDF | `GET` https://s07-26-team36-benchmark-engine-565u.onrender.com/api/v1/report/{id} |
 
 ### Instrucciones de deploy propio
@@ -162,9 +162,10 @@ S07-26-Team36-benchmark-engine/
 
 | Capa | Tecnología |
 |------|-----------|
+| Frontend | HTML / CSS / JS vanilla |
 | Backend / Motor | Python 3.12 + FastAPI |
 | Base de datos | SQLite (MVP) |
-| Deploy | Render / Railway |
+| Deploy | Render |
 | Tests | pytest |
 
 ---
