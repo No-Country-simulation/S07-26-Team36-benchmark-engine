@@ -112,13 +112,22 @@ API disponible en `http://localhost:8000/docs`
 
 ## Deploy en Render
 
+🚀 **API en producción:** https://s07-26-team36-benchmark-engine-565u.onrender.com
+
+| Recurso | URL |
+|---------|-----|
+| API base | https://s07-26-team36-benchmark-engine-565u.onrender.com |
+| Documentación interactiva | https://s07-26-team36-benchmark-engine-565u.onrender.com/docs |
+| Enviar benchmark | `POST` https://s07-26-team36-benchmark-engine-565u.onrender.com/api/v1/submit |
+| Reporte PDF | `GET` https://s07-26-team36-benchmark-engine-565u.onrender.com/api/v1/report/{id} |
+
+### Instrucciones de deploy propio
+
 1. Crear cuenta en [render.com](https://render.com)
 2. **New → Web Service → Connect a repository**
 3. Seleccionar este repositorio
 4. Render detecta `render.yaml` automáticamente
 5. Click en **Deploy**
-
-La URL pública queda disponible en el dashboard de Render.
 
 ---
 
