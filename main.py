@@ -125,3 +125,67 @@ def get_submissions():
     rows = conn.execute("SELECT * FROM responses").fetchall()
     conn.close()
     return {"total_records": len(rows), "data": [dict(r) for r in rows]}
+
+
+@app.get("/api/v1/report/{submission_id}")
+def get_report(submission_id: int):
+    """
+    Devuelve el JSON estructurado listo para generar el PDF del reporte.
+    Incluye scores, percentiles, perfil de fricción y recomendación.
+    """
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM responses WHERE id = ?", (submission_id,)).fetchone()
+    conn.close()
+
+    if not row:
+        raise HTTPException(status_code=404, detail=f"Submission {submission_id} no encontrada.")
+
+    row = dict(row)
+
+    respuestas = {f"P{i}": row[f"p{i}"] for i in range(1, 13)}
+    scores = calculate_scores(respuestas)
+    perfil = get_qualitative_output(row["dimension_mas_debil"])
+
+    LABELS = {
+        "visibilidad_cross_layer": "Visibilidad Cross-Layer",
+        "atribucion_friccion":     "Atribución de Fricción",
+        "latencia_coordinacion":   "Latencia de Coordinación",
+        "auto_cuantificacion":     "Auto-Cuantificación",
+        "bloqueantes":             "Bloqueantes",
+    }
+
+    return {
+        "reporte": {
+            "submission_id": submission_id,
+            "fecha": row["created_at"],
+            "score_total": row["score_total"],
+            "percentil_global": row["percentil_global"],
+            "interpretacion_percentil": (
+                f"Tu facility supera al {row['percentil_global']:.0f}% "
+                "de los operadores de la industria."
+            ),
+            "dimensiones": [
+                {
+                    "nombre": LABELS[d],
+                    "clave": d,
+                    "score": scores["scores_por_dimension"][d],
+                    "es_punto_debil": d == row["dimension_mas_debil"],
+                }
+                for d in LABELS
+            ],
+            "perfil_friccion": {
+                "nombre": perfil["nombre_perfil"],
+                "descripcion": perfil["descripcion_problema"],
+                "recomendacion": perfil["cuartil_superior"],
+            },
+            "contexto_dataset": {
+                "total_respuestas": get_n_responses(),
+                "nota": (
+                    "Tu posición se calcula contra una distribución que combina "
+                    "datos de la industria (Uptime Institute, Gartner) con las "
+                    "respuestas acumuladas en este benchmark."
+                ),
+            },
+        }
+    }
