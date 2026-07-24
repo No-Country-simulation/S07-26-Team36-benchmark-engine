@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Benchmark de Madurez — Data Centers</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #080808;
+    --surface:   #0F0F0F;
+    --elevated:  #1A1A1A;
+    --border:    #2A2A2A;
+    --orange:    #F97316;
+    --amber:     #FBBF24;
+    --text:      #F0F0F0;
+    --muted:     #6B6B6B;
+    --success:   #22C55E;
+    --glow:      rgba(249,115,22,0.25);
+    --glow-sm:   rgba(249,115,22,0.12);
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar-wrap {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: 100;
+  }
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--orange), var(--amber));
+    width: 0%;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 0 12px var(--orange), 0 0 24px var(--glow);
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 640px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    text-wrap: balance;
+    background: linear-gradient(135deg, var(--text) 30%, var(--orange) 70%, var(--amber) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+
+  .header p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 480px;
+    margin: 0 auto;
+    text-wrap: balance;
+  }
+
+  /* ── STEP INDICATOR ── */
+  .step-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .step-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+
+  .step-count {
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── DIMENSION TITLE ── */
+  .dimension-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .dimension-weight {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 28px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── QUESTION ── */
+  .question {
+    margin-bottom: 32px;
+  }
+
+  .question-text {
+    font-size: 14px;
+    color: #C0C0C0;
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    user-select: none;
+  }
+
+  .option:hover {
+    border-color: #444;
+    background: var(--elevated);
+  }
+
+  .option.selected {
+    border-color: var(--orange);
+    background: var(--elevated);
+    box-shadow: 0 0 0 1px var(--orange), inset 0 0 20px var(--glow-sm);
+    animation: pulse-select 0.3s ease;
+  }
+
+  @keyframes pulse-select {
+    0%   { box-shadow: 0 0 0 1px var(--orange), 0 0 16px var(--glow); }
+    100% { box-shadow: 0 0 0 1px var(--orange), inset 0 0 20px var(--glow-sm); }
+  }
+
+  .option-num {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-top: 1px;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+
+  .option.selected .option-num {
+    border-color: var(--orange);
+    color: var(--orange);
+    background: rgba(249,115,22,0.1);
+  }
+
+  .option-text {
+    font-size: 13px;
+    color: #AAAAAA;
+    line-height: 1.45;
+    transition: color 0.2s;
+  }
+
+  .option.selected .option-text {
+    color: var(--text);
+  }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 36px;
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { border-color: #555; color: var(--text); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 0 20px var(--glow);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 32px var(--glow), 0 0 8px var(--amber);
+    transform: translateY(-1px);
+  }
+  .btn-primary:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-warn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    color: #000;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 16px;
+    box-shadow: 0 0 24px var(--glow);
+    margin-top: 8px;
+  }
+  .btn-warn:hover {
+    box-shadow: 0 0 40px var(--glow), 0 0 12px var(--amber);
+    transform: translateY(-1px);
+  }
+  .btn-warn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+  /* ── RESULTS ── */
+  #results {
+    display: none;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .results-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .score-ring-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .score-ring {
+    position: relative;
+    width: 140px;
+    height: 140px;
+  }
+
+  .score-ring svg {
+    transform: rotate(-90deg);
+  }
+
+  .score-ring-num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-big {
+    font-size: 36px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+  }
+
+  .score-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .percentil-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 100px;
+    background: rgba(249,115,22,0.1);
+    border: 1px solid rgba(249,115,22,0.3);
+    font-size: 13px;
+    color: var(--orange);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .results-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .results-header p {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ── DIMENSIONS BREAKDOWN ── */
+  .breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .breakdown-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .dim-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .dim-row:last-child { margin-bottom: 0; }
+
+  .dim-info { display: flex; flex-direction: column; gap: 6px; }
+
+  .dim-name {
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dim-name .weak-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(249,115,22,0.15);
+    border: 1px solid rgba(249,115,22,0.4);
+    color: var(--orange);
+  }
+
+  .dim-bar-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .dim-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--orange), var(--amber));
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  .dim-score {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* ── PROFILE CARD ── */
+  .profile-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--orange);
+  }
+
+  .profile-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 8px;
+  }
+
+  .profile-name {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .profile-desc {
+    font-size: 14px;
+    color: #AAAAAA;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .top-quartile {
+    background: var(--elevated);
+    border-radius: 8px;
+    padding: 14px 16px;
+    border-left: 2px solid var(--amber);
+  }
+
+  .top-quartile-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+
+  .top-quartile p {
+    font-size: 13px;
+    color: #C0C0C0;
+    line-height: 1.55;
+  }
+
+  /* ── METADATA ── */
+  .meta-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .meta-chip {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .meta-chip .val {
+    font-size: 22px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .meta-chip .lbl {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── RESTART ── */
+  .restart-wrap {
+    text-align: center;
+    padding-top: 8px;
+  }
+
+  .btn-restart {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px 24px;
+    font-size: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-restart:hover { border-color: #555; color: var(--text); }
+
+  /* ── LOADING ── */
+  #loading {
+    display: none;
+    text-align: center;
+    padding: 60px 0;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #loading p {
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ── ERROR ── */
+  .error-msg {
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.3);
+    color: #FCA5A5;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ── INTRO ── */
+  #intro { animation: fadeUp 0.4s ease both; }
+
+  .intro-features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 32px 0 40px;
+  }
+
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .feature-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    flex-shrink: 0;
+    box-shadow: 0 0 8px var(--glow);
+  }
+
+  .feature span {
+    font-size: 13px;
+    color: #AAAAAA;
+  }
+
+  .feature strong {
+    color: var(--text);
+  }
+
+  .time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .time-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+  }
+
+  /* ── STEP SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp 0.35s ease both; }
+
+  @media (max-width: 480px) {
+    .meta-row { flex-direction: column; }
+    .nav { flex-direction: column-reverse; }
+    .btn { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+<div class="page">
+<div class="container">
+
+  <!-- INTRO -->
+  <div id="intro" class="screen active">
+    <div class="header">
+      <div class="eyebrow">Benchmark de Madurez</div>
+      <h1>¿Sabe su data center cuánta capacidad está tirando a la basura?</h1>
+      <p>Complete el diagnóstico y descubra su posición real dentro de la industria — un dato que no existe en ningún otro lugar.</p>
+    </div>
+
+    <div style="text-align:center">
+      <div class="time-badge">Menos de 10 minutos &nbsp;·&nbsp; 12 preguntas &nbsp;·&nbsp; Resultado inmediato</div>
+    </div>
+
+    <div class="intro-features">
+      <div class="feature"><div class="feature-dot"></div><span><strong>5 dimensiones</strong> de coordinación operacional medidas con precisión</span></div>
+      <div class="feature"><div class="feature-dot"></div><span><strong>Percentil real</strong> comparado contra operadores de la industria</span></div>
+      <div class="feature"><div class="feature-dot"></div><span><strong>Perfil de fricción</strong> — identifica exactamente dónde pierde capacidad su facility</span></div>
+      <div class="feature"><div class="feature-dot"></div><span><strong>Anónimo</strong> — sus respuestas se agregan al dataset sin datos identificatorios</span></div>
+    </div>
+
+    <button class="btn btn-warn" onclick="startBenchmark()">Iniciar diagnóstico →</button>
+  </div>
+
+  <!-- STEPS -->
+  <div id="steps-wrap">
+    <div id="step-1" class="screen"></div>
+    <div id="step-2" class="screen"></div>
+    <div id="step-3" class="screen"></div>
+    <div id="step-4" class="screen"></div>
+    <div id="step-5" class="screen"></div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Calculando su posición en la industria…</p>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="screen"></div>
+
+</div>
+</div>
+
+<script>
+const API = 'https://s07-26-team36-benchmark-engine-565u.onrender.com';
+
+const DIMENSIONS = [
+  {
+    key: 'visibilidad',
+    label: 'Visibilidad Cross-Layer',
+    weight: '25%',
+    questions: [
+      {
+        id: 'P1',
+        text: '¿Cómo se monitorea la relación entre el consumo térmico/eléctrico y la carga de procesamiento de workloads de IA?',
+        options: [
+          'Silos separados: Facility y TI usan herramientas independientes sin cruce de datos.',
+          'Reportes consolidados manualmente de forma periódica (semanal/mensual).',
+          'Dashboards unificados con métricas de energía y carga en tiempo real.',
+          'Integración con APIs automatizadas que alimentan modelos predictivos de capacidad/enfriamiento.'
+        ]
+      },
+      {
+        id: 'P2',
+        text: '¿Con qué granularidad física identifican el desperdicio de energía en el facility?',
+        options: [
+          'Solo a nivel global del edificio/data center (PUE global).',
+          'A nivel de sala (Data Hall) o fila de racks.',
+          'A nivel de gabinete/rack individual.',
+          'A nivel de servidor y tarjeta (GPU/acelerador) en tiempo real.'
+        ]
+      },
+      {
+        id: 'P3',
+        text: '¿Cómo reacciona la infraestructura física ante cambios abruptos de carga de trabajo de IA?',
+        options: [
+          'De forma totalmente reactiva o manual tras una alarma por sobretemperatura.',
+          'Programada mediante reglas o calendarios predefinidos de carga.',
+          'Con alertas tempranas automatizadas antes de saturar la capacidad.',
+          'Con orquestación dinámica: ajuste automático de enfriamiento y flujo eléctrico coordinado con la aplicación.'
+        ]
+      }
+    ]
+  },
+  {
+    key: 'friccion',
+    label: 'Atribución de Fricción',
+    weight: '20%',
+    questions: [
+      {
+        id: 'P4',
+        text: '¿Cómo cuantifican el costo financiero de la capacidad encendida pero no utilizada (stranded capacity)?',
+        options: [
+          'No se calcula ni se atribuye a ningún presupuesto o departamento.',
+          'Se estiman promedios globales de pérdida en revisiones financieras anuales.',
+          'Se calcula el costo por sala o proyecto basándose en consumo estimado.',
+          'Se atribuye el costo exacto por capacidad ociosa en tiempo real por proyecto/workload.'
+        ]
+      },
+      {
+        id: 'P5',
+        text: '¿Cómo identifican la causa raíz cuando existe una ineficiencia entre la capa física y la de cómputo?',
+        options: [
+          'Es difícil determinarla; suele haber debate entre el equipo de Facility y el de TI.',
+          'Se analiza tras incidentes mediante reuniones post-mortem manuales.',
+          'Se cuenta con un flujo estandarizado que mapea la causa en cuestión de horas.',
+          'Diagnóstico automatizado inmediato (root-cause analysis) guiado por software.'
+        ]
+      }
+    ]
+  },
+  {
+    key: 'latencia',
+    label: 'Latencia de Coordinación',
+    weight: '25%',
+    questions: [
+      {
+        id: 'P6',
+        text: 'Cuando se aprovisiona un nuevo cluster de IA, ¿cuánto tiempo toma coordinar la capacidad térmica y eléctrica?',
+        options: [
+          'De varias semanas a meses (procesos burocráticos/manuales de aprobación).',
+          'De varios días a una semana.',
+          'Pocas horas (procesos parcialmente automatizados).',
+          'Minutos u homologación instantánea a través de software de gestión unificada.'
+        ]
+      },
+      {
+        id: 'P7',
+        text: 'Ante una falla de enfriamiento parcial o pico térmico, ¿qué tan rápido responde el software para reasignar cargas?',
+        options: [
+          'No hay comunicación; el hardware se apaga por protección de temperatura.',
+          'Intervención humana requerida para apagar o migrar servidores manualmente.',
+          'Reglas automatizadas simples (migración si la temperatura supera un umbral).',
+          'Rebalanceo autónomo de workloads en milisegundos sin interrupción del servicio.'
+        ]
+      },
+      {
+        id: 'P8',
+        text: '¿Con qué frecuencia se sincronizan las políticas de ahorro de energía con la programación de tareas de cómputo?',
+        options: [
+          'Nunca / Políticas fijas estáticas todo el año.',
+          'Ajustes estacionales o mensuales.',
+          'Ajustes diarios según tarifas de energía o carga proyectada.',
+          'Sincronización continua y en tiempo real (Smart Grid / Dynamic Power Capping).'
+        ]
+      }
+    ]
+  },
+  {
+    key: 'cuantificacion',
+    label: 'Auto-Cuantificación',
+    weight: '15%',
+    questions: [
+      {
+        id: 'P9',
+        text: '¿Cuentan con un KPI específico para medir la capacidad ociosa pagada y encendida?',
+        options: [
+          'No contamos con una métrica definida para esto.',
+          'Usamos indicadores genéricos (como PUE) que no capturan la ociosidad del servidor.',
+          'Medimos el porcentaje de capacidad no aprovechada de forma periódica.',
+          'Tenemos un índice en tiempo real que mide la discrepancia entre energía consumida y cómputo útil.'
+        ]
+      },
+      {
+        id: 'P10',
+        text: '¿Qué porcentaje de la capacidad de energía/enfriamiento estiman que está encendida sin generar cómputo útil?',
+        options: [
+          'Desconocido / No tenemos datos suficientes para estimarlo.',
+          'Mayor al 30% de la capacidad total.',
+          'Entre 10% y 30%.',
+          'Menor al 10% (operación altamente optimizada).'
+        ]
+      }
+    ]
+  },
+  {
+    key: 'bloqueantes',
+    label: 'Bloqueantes',
+    weight: '15%',
+    questions: [
+      {
+        id: 'P11',
+        text: '¿Cuál es la principal barrera organizacional para coordinar las operaciones físicas con las de TI?',
+        options: [
+          'Silos culturales: Facility y TI reportan a áreas sin alineación.',
+          'Contratos rígidos con proveedores o SLAs inflexibles.',
+          'Falta de herramientas tecnológicas que permitan la comunicación entre ambas capas.',
+          'No existen barreras significativas; las áreas trabajan con metas de eficiencia compartidas.'
+        ]
+      },
+      {
+        id: 'P12',
+        text: '¿Qué nivel de automatización tienen permitido aplicar sobre la infraestructura física desde el software?',
+        options: [
+          'Ninguno; la infraestructura física solo se manipula de forma manual e in situ.',
+          'Solo monitoreo de lectura; la intervención requiere acción humana directa.',
+          'Automatización de seguridad (apagados o mitigaciones de emergencia preprogramadas).',
+          'Control dinámico bidireccional totalmente automatizado (software-defined infrastructure).'
+        ]
+      }
+    ]
+  }
+];
+
+const DIM_LABELS = {
+  visibilidad_cross_layer: 'Visibilidad Cross-Layer',
+  atribucion_friccion: 'Atribución de Fricción',
+  latencia_coordinacion: 'Latencia de Coordinación',
+  auto_cuantificacion: 'Auto-Cuantificación',
+  bloqueantes: 'Bloqueantes',
+};
+
+let currentStep = 0;
+let answers = {};
+
+function setProgress(pct) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startBenchmark() {
+  renderSteps();
+  showScreen('step-1');
+  currentStep = 1;
+  setProgress(5);
+}
+
+function renderSteps() {
+  DIMENSIONS.forEach((dim, i) => {
+    const stepNum = i + 1;
+    const el = document.getElementById('step-' + stepNum);
+    el.innerHTML = `
+      <div class="step-meta">
+        <span class="step-label">${dim.label}</span>
+        <span class="step-count">${stepNum} / ${DIMENSIONS.length}</span>
+      </div>
+      <div class="dimension-weight">Ponderación: ${dim.weight} del score total</div>
+      ${dim.questions.map(q => renderQuestion(q)).join('')}
+      <div id="error-${stepNum}" class="error-msg">Por favor responde todas las preguntas antes de continuar.</div>
+      <div class="nav">
+        ${stepNum > 1
+          ? `<button class="btn btn-ghost" onclick="goStep(${stepNum - 1})">← Anterior</button>`
+          : `<div></div>`}
+        ${stepNum < DIMENSIONS.length
+          ? `<button class="btn btn-primary" onclick="goStep(${stepNum + 1})">Siguiente →</button>`
+          : `<button class="btn btn-primary" onclick="submitBenchmark()">Ver mi resultado →</button>`}
+      </div>`;
+  });
+}
+
+function renderQuestion(q) {
+  return `
+    <div class="question" id="q-wrap-${q.id}">
+      <div class="question-text">${q.text}</div>
+      <div class="options">
+        ${q.options.map((opt, i) => `
+          <div class="option" id="opt-${q.id}-${i+1}" onclick="selectOption('${q.id}', ${i+1})">
+            <div class="option-num">${i+1}</div>
+            <div class="option-text">${opt}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function selectOption(qId, val) {
+  answers[qId] = val;
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`opt-${qId}-${i}`);
+    if (el) el.classList.toggle('selected', i === val);
+  }
+}
+
+function getStepQuestions(stepNum) {
+  return DIMENSIONS[stepNum - 1].questions.map(q => q.id);
+}
+
+function validateStep(stepNum) {
+  const qIds = getStepQuestions(stepNum);
+  return qIds.every(id => answers[id] !== undefined);
+}
+
+function goStep(stepNum) {
+  const from = currentStep;
+  if (stepNum > from && !validateStep(from)) {
+    document.getElementById('error-' + from).style.display = 'block';
+    return;
+  }
+  document.getElementById('error-' + from).style.display = 'none';
+  currentStep = stepNum;
+  showScreen('step-' + stepNum);
+  setProgress((stepNum / (DIMENSIONS.length + 1)) * 100);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function submitBenchmark() {
+  if (!validateStep(currentStep)) {
+    document.getElementById('error-' + currentStep).style.display = 'block';
+    return;
+  }
+
+  showScreen('loading');
+  document.getElementById('loading').style.display = 'block';
+  setProgress(90);
+
+  try {
+    const res = await fetch(`${API}/api/v1/submit`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(answers)
+    });
+    if (!res.ok) throw new Error('Error del servidor');
+    const data = await res.json();
+    renderResults(data);
+    setProgress(100);
+    document.getElementById('loading').style.display = 'none';
+    showScreen('results');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    goStep(DIMENSIONS.length);
+    document.getElementById('error-' + DIMENSIONS.length).textContent = 'Error al conectar con el servidor. Intenta de nuevo.';
+    document.getElementById('error-' + DIMENSIONS.length).style.display = 'block';
+  }
+}
+
+function renderResults(d) {
+  const score = Math.round(d.score_total);
+  const pct = Math.round(d.percentil_global);
+  const circumference = 2 * Math.PI * 54;
+  const filled = (score / 100) * circumference;
+
+  const dimRows = Object.entries(d.scores_por_dimension).map(([key, val]) => {
+    const isWeak = key === d.dimension_mas_debil;
+    const label = DIM_LABELS[key] || key;
+    const dimPct = Math.round(d.percentiles_por_dimension[key] || 0);
+    return `
+      <div class="dim-row">
+        <div class="dim-info">
+          <div class="dim-name">
+            ${label}
+            ${isWeak ? '<span class="weak-tag">Punto débil</span>' : ''}
+          </div>
+          <div class="dim-bar-wrap">
+            <div class="dim-bar" data-width="${Math.round(val)}"></div>
+          </div>
+        </div>
+        <div class="dim-score">${Math.round(val)}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('results').innerHTML = `
+    <div class="results-header">
+      <div class="score-ring-wrap">
+        <div class="score-ring">
+          <svg width="140" height="140" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="54" fill="none" stroke="#2A2A2A" stroke-width="8"/>
+            <circle cx="60" cy="60" r="54" fill="none"
+              stroke="url(#grad)" stroke-width="8"
+              stroke-linecap="round"
+              stroke-dasharray="${filled} ${circumference}"
+              style="transition: stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1)"/>
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#F97316"/>
+                <stop offset="100%" stop-color="#FBBF24"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="score-ring-num">
+            <div class="score-big" id="score-counter">0</div>
+            <div class="score-label">/ 100</div>
+          </div>
+        </div>
+      </div>
+      <div class="percentil-badge">Percentil ${pct} — supera al ${pct}% de la industria</div>
+      <h2>${d.nombre_perfil}</h2>
+      <p>${d.n_respuestas_usadas} operadores en el dataset · ${Math.round(d.peso_primario_actual * 100)}% datos primarios</p>
+    </div>
+
+    <div class="meta-row">
+      <div class="meta-chip">
+        <div class="val">${score}</div>
+        <div class="lbl">Score total</div>
+      </div>
+      <div class="meta-chip">
+        <div class="val">${pct}°</div>
+        <div class="lbl">Percentil global</div>
+      </div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-title">Desglose por dimensión</div>
+      ${dimRows}
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-eyebrow">Tu perfil de fricción principal</div>
+      <div class="profile-name">${d.nombre_perfil}</div>
+      <div class="profile-desc">${d.descripcion_problema}</div>
+      <div class="top-quartile">
+        <div class="top-quartile-label">Qué hacen diferente los del cuartil superior</div>
+        <p>${d.cuartil_superior}</p>
+      </div>
+    </div>
+
+    <div class="restart-wrap">
+      <button class="btn-restart" onclick="restartBenchmark()">Volver a empezar</button>
+    </div>`;
+
+  // Animate score counter
+  animateCounter('score-counter', 0, score, 1200);
+
+  // Animate bars after paint
+  setTimeout(() => {
+    document.querySelectorAll('.dim-bar').forEach(bar => {
+      bar.style.width = bar.dataset.width + '%';
+    });
+  }, 100);
+}
+
+function animateCounter(id, from, to, duration) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const start = performance.now();
+  function frame(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(from + (to - from) * ease);
+    if (t < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function restartBenchmark() {
+  answers = {};
+  currentStep = 0;
+  setProgress(0);
+  showScreen('intro');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

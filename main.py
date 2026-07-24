@@ -1,6 +1,9 @@
 import sqlite3
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 import sys
@@ -16,6 +19,17 @@ app = FastAPI(
     description="Motor de benchmark de madurez operacional para data centers.",
     version="2.0.0",
 )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+STATIC_DIR = Path(__file__).parent / "static"
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 DB_PATH = "benchmark.db"
 
@@ -68,7 +82,14 @@ def get_n_responses() -> int:
 
 @app.get("/")
 def home():
+    index = STATIC_DIR / "index.html"
+    if index.exists():
+        return FileResponse(str(index))
     return {"status": "ok", "message": "Benchmark API funcionando."}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 
 @app.post("/api/v1/submit")
