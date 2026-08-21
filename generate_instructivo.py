@@ -111,7 +111,7 @@ pdf.bullet('P: ¿Como mejora la precision? R: Con cada respuesta nueva, el peso 
 pdf.section('9. Soporte y Contacto')
 pdf.body('Repositorio: https://github.com/No-Country-simulation/S07-26-Team36-benchmark-engine.git')
 pdf.body('Equipo: Gustavo (Data Scientist), Gio (Data Analyst), Marisol (Functional Analyst)')
-pdf.body('Sprint 7 - TripleTen / No Country Simulation')
+
 
 pdf_bytes = pdf.output(dest='S')
 if isinstance(pdf_bytes, str):
