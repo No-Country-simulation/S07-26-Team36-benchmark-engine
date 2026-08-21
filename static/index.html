@@ -639,6 +639,298 @@
     .nav { flex-direction: column-reverse; }
     .btn { width: 100%; text-align: center; }
   }
+
+  /* ── TOOLTIPS ── */
+  .tooltip-trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--elevated);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: help;
+    flex-shrink: 0;
+    margin-left: 6px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .tooltip-trigger:hover {
+    border-color: var(--orange);
+    color: var(--orange);
+  }
+  .tooltip-trigger::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 280px;
+    padding: 10px 12px;
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.5;
+    white-space: normal;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    z-index: 1000;
+    transition: opacity 0.2s, visibility 0.2s, transform 0.2s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .tooltip-trigger::before {
+    content: '';
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--border);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+  }
+  .tooltip-trigger:hover::after,
+  .tooltip-trigger:hover::before {
+    opacity: 1;
+    visibility: visible;
+  }
+  .tooltip-trigger:focus-visible::after,
+  .tooltip-trigger:focus-visible::before {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ── INFO PANEL ── */
+  .info-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  .info-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .info-panel-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .info-panel-icon svg { width: 16px; height: 16px; color: #000; }
+  .info-panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .info-panel-body {
+    font-size: 13px;
+    color: #AAAAAA;
+    line-height: 1.6;
+  }
+  .info-panel-body strong { color: var(--text); }
+
+  /* ── INSTRUCTIONS MODAL ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    animation: slideUp 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .modal-title {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--text), var(--orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--elevated);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .modal-close:hover { border-color: var(--orange); color: var(--orange); }
+
+  .modal-section {
+    margin-bottom: 28px;
+  }
+  .modal-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-section-title::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--orange);
+    box-shadow: 0 0 8px var(--glow);
+  }
+  .modal-section-body {
+    font-size: 13px;
+    color: #AAAAAA;
+    line-height: 1.7;
+  }
+  .modal-section-body ul { margin: 8px 0 0 20px; }
+  .modal-section-body li { margin-bottom: 6px; }
+  .modal-section-body strong { color: var(--text); }
+  .modal-section-body code {
+    background: var(--elevated);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--amber);
+  }
+
+  .modal-dim-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .modal-dim-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .modal-dim-color {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, var(--orange), var(--amber));
+    flex-shrink: 0;
+  }
+  .modal-dim-info { flex: 1; }
+  .modal-dim-name { font-weight: 600; color: var(--text); font-size: 13px; }
+  .modal-dim-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .modal-dim-weight { font-size: 12px; font-weight: 700; color: var(--orange); min-width: 50px; text-align: right; }
+
+  .modal-footer {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+  }
+  .modal-footer .btn { min-width: 120px; }
+
+  /* ── HEADER ACTIONS ── */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .btn-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .btn-info:hover { border-color: var(--orange); color: var(--orange); }
+  .btn-info svg { width: 16px; height: 16px; }
+
+  /* ── QUESTION HELP TEXT ── */
+  .question-help {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+    padding-left: 38px;
+    border-left: 2px solid var(--border);
+    line-height: 1.5;
+  }
+  .question-help strong { color: var(--orange); }
+
+  /* ── STEP INTRO ── */
+  .step-intro {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  .step-intro-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .step-intro-body {
+    font-size: 13px;
+    color: #AAAAAA;
+    line-height: 1.6;
+  }
 </style>
 </head>
 <body>
@@ -665,6 +957,34 @@
       <div class="feature"><div class="feature-dot"></div><span><strong>Percentil real</strong> comparado contra operadores de la industria</span></div>
       <div class="feature"><div class="feature-dot"></div><span><strong>Perfil de fricción</strong> — identifica exactamente dónde pierde capacidad su facility</span></div>
       <div class="feature"><div class="feature-dot"></div><span><strong>Anónimo</strong> — sus respuestas se agregan al dataset sin datos identificatorios</span></div>
+    </div>
+
+    <div class="info-panel">
+      <div class="info-panel-header">
+        <div class="info-panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4M12 8h.01"/>
+          </svg>
+        </div>
+        <div class="info-panel-title">Cómo funciona</div>
+      </div>
+      <div class="info-panel-body">
+        <strong>12 preguntas</strong> agrupadas en 5 dimensiones de madurez operacional. Cada respuesta puntúa de 1 (incipiente) a 4 (optimizado).
+        Su score se compara contra una <strong>distribución mixta dinámica</strong> que combina datos públicos de la industria (Uptime Institute, Gartner, LBNL)
+        con respuestas reales de otros operadores. El peso de los datos propios crece automáticamente (fórmula N/(N+K)).
+        Al final recibe: score total, percentil global, desglose por dimensión, <strong>perfil de fricción principal</strong> y recomendación del cuartil superior.
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-info" onclick="openInstructions()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M12 16v-4M12 8h.01"/>
+        </svg>
+        Ver instrucciones completas
+      </button>
     </div>
 
     <button class="btn btn-warn" onclick="startBenchmark()">Iniciar diagnóstico →</button>
@@ -880,16 +1200,61 @@ function startBenchmark() {
 }
 
 function renderSteps() {
+  const stepIntros = {
+    1: {
+      title: "Visibilidad Cross-Layer (25%)",
+      body: "Mide qué tan integrada está la vista entre la capa física (energía, cooling) y la capa de TI (workloads). Sin visibilidad unificada, es imposible optimizar: no sabes qué servidores consumen energía sin producir cómputo útil."
+    },
+    2: {
+      title: "Atribución de Fricción (20%)",
+      body: "Evalúa si puedes cuantificar y atribuir el costo financiero de la capacidad desperdiciada. ¿Sabes exactamente qué proyecto, cliente o servidor genera el gasto innecesario? El cuartil superior rastrea el costo hasta el nivel de workload."
+    },
+    3: {
+      title: "Latencia de Coordinación (25%)",
+      body: "Mide la velocidad de reacción ante desacoples entre capacidad y demanda. Cuando sube la temperatura o hay un burst de IA, ¿el sistema se reequilibra en milisegundos o requiere intervención manual? La latencia alta = energía desperdiciada y riesgo de caída."
+    },
+    4: {
+      title: "Auto-Cuantificación (15%)",
+      body: "Refleja si el operador mide activamente su propia capacidad ociosa. ¿Tienen un KPI específico para 'capacidad pagada y encendida sin producir'? ¿Conocen el porcentaje de stranded capacity? Sin medición, no hay mejora posible."
+    },
+    5: {
+      title: "Bloqueantes (15%)",
+      body: "Identifica las barreras organizacionales y técnicas que impiden la coordinación: silos culturales, SLAs rígidos, falta de herramientas o restricciones contractuales. El cuartil superior alinea incentivos TI-Facility y permite control automático por software."
+    }
+  };
+
+  const questionHelp = {
+    P1: "Opción 1 = silos totales; Opción 4 = APIs que alimentan modelos predictivos de capacidad/enfriamiento en tiempo real.",
+    P2: "Granularidad: 1 = PUE global edificio; 4 = nivel servidor/GPU individual en tiempo real.",
+    P3: "Reacción ante bursts de IA: 1 = reactivo manual tras alarma; 4 = orquestación dinámica automática coordinada con la aplicación.",
+    P4: "Costo de stranded capacity: 1 = no se calcula; 4 = atribución exacta en tiempo real por proyecto/workload.",
+    P5: "Root-cause de ineficiencia: 1 = debate entre equipos; 4 = diagnóstico automatizado inmediato guiado por software.",
+    P6: "Tiempo para coordinar térmica/eléctrica al aprovisionar cluster: 1 = semanas/meses; 4 = minutos vía software unificado.",
+    P7: "Respuesta ante falla cooling/pico térmico: 1 = throttling/shutdown hardware; 4 = rebalanceo autónomo workloads en ms sin interrupción.",
+    P8: "Sincronización políticas energía-cómputo: 1 = nunca/estáticas; 4 = tiempo real (Smart Grid / Dynamic Power Capping).",
+    P9: "KPI de capacidad ociosa: 1 = no existe; 4 = índice tiempo real que mide discrepancia energía vs cómputo útil.",
+    P10: "Estimación % capacidad encendida sin cómputo útil: 1 = desconocido; 4 = <10% (altamente optimizado).",
+    P11: "Barrera organizacional principal: 1 = silos culturales; 4 = metas eficiencia compartidas sin barreras.",
+    P12: "Automatización permitida sobre infra física: 1 = solo manual in situ; 4 = control dinámico bidireccional total (software-defined infrastructure)."
+  };
+
   DIMENSIONS.forEach((dim, i) => {
     const stepNum = i + 1;
+    const intro = stepIntros[stepNum];
     const el = document.getElementById('step-' + stepNum);
     el.innerHTML = `
+      <div class="step-intro">
+        <div class="step-intro-title">${intro.title}</div>
+        <div class="step-intro-body">${intro.body}</div>
+      </div>
       <div class="step-meta">
-        <span class="step-label">${dim.label}</span>
+        <span class="step-label">${dim.label}
+          <span class="tooltip-trigger" data-tip="${dim.questions.map(q => q.id + ': ' + questionHelp[q.id]).join(' | ')}">?</span>
+        </span>
         <span class="step-count">${stepNum} / ${DIMENSIONS.length}</span>
       </div>
       <div class="dimension-weight">Ponderación: ${dim.weight} del score total</div>
-      ${dim.questions.map(q => renderQuestion(q)).join('')}
+      ${dim.questions.map(q => renderQuestion(q, questionHelp[q.id])).join('')}
       <div id="error-${stepNum}" class="error-msg">Por favor responde todas las preguntas antes de continuar.</div>
       <div class="nav">
         ${stepNum > 1
@@ -902,10 +1267,12 @@ function renderSteps() {
   });
 }
 
-function renderQuestion(q) {
+function renderQuestion(q, helpText) {
   return `
     <div class="question" id="q-wrap-${q.id}">
-      <div class="question-text">${q.text}</div>
+      <div class="question-text">${q.text}
+        <span class="tooltip-trigger" data-tip="${helpText}">?</span>
+      </div>
       <div class="options">
         ${q.options.map((opt, i) => `
           <div class="option" id="opt-${q.id}-${i+1}" onclick="selectOption('${q.id}', ${i+1})">
@@ -1092,6 +1459,148 @@ function restartBenchmark() {
   showScreen('intro');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+function openInstructions() {
+  document.getElementById('instructions-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInstructions() {
+  document.getElementById('instructions-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeInstructions();
+});
+
+document.getElementById('instructions-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeInstructions();
+});
 </script>
+
+<!-- INSTRUCTIONS MODAL -->
+<div id="instructions-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Instrucciones de la Plataforma</h2>
+      <button class="modal-close" onclick="closeInstructions()" aria-label="Cerrar instrucciones">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Qué es este Benchmark</h3>
+      <div class="modal-section-body">
+        Mide la <strong>madurez operacional de tu data center</strong> para coordinar la capa física (energía, cooling) con la capa de TI (workloads de IA).
+        Diagnostica cuánta capacidad pagada y encendida no produce cómputo útil y te posiciona en percentil frente a la industria.
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Las 5 Dimensiones</h3>
+      <div class="modal-dim-list">
+        <div class="modal-dim-item">
+          <div class="modal-dim-color"></div>
+          <div class="modal-dim-info">
+            <div class="modal-dim-name">Visibilidad Cross-Layer (25%)</div>
+            <div class="modal-dim-desc">Vista unificada de energía, cooling y workloads en tiempo real.</div>
+          </div>
+          <div class="modal-dim-weight">25%</div>
+        </div>
+        <div class="modal-dim-item">
+          <div class="modal-dim-color"></div>
+          <div class="modal-dim-info">
+            <div class="modal-dim-name">Latencia de Coordinación (25%)</div>
+            <div class="modal-dim-desc">Velocidad de ajuste automático ante cambios de workload o fallas térmicas.</div>
+          </div>
+          <div class="modal-dim-weight">25%</div>
+        </div>
+        <div class="modal-dim-item">
+          <div class="modal-dim-color"></div>
+          <div class="modal-dim-info">
+            <div class="modal-dim-name">Atribución de Fricción (20%)</div>
+            <div class="modal-dim-desc">Identificación y atribución del costo financiero de la capacidad desperdiciada.</div>
+          </div>
+          <div class="modal-dim-weight">20%</div>
+        </div>
+        <div class="modal-dim-item">
+          <div class="modal-dim-color"></div>
+          <div class="modal-dim-info">
+            <div class="modal-dim-name">Auto-Cuantificación (15%)</div>
+            <div class="modal-dim-desc">Medición activa de stranded capacity propia con KPIs específicos.</div>
+          </div>
+          <div class="modal-dim-weight">15%</div>
+        </div>
+        <div class="modal-dim-item">
+          <div class="modal-dim-color"></div>
+          <div class="modal-dim-info">
+            <div class="modal-dim-name">Bloqueantes (15%)</div>
+            <div class="modal-dim-desc">Barreras organizacionales, contractuales o técnicas para la coordinación.</div>
+          </div>
+          <div class="modal-dim-weight">15%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Cómo Responder</h3>
+      <div class="modal-section-body">
+        <ul>
+          <li>Cada pregunta tiene <strong>4 opciones</strong> en escala progresiva: 1 = incipiente / reactivo → 4 = optimizado / autónomo.</li>
+          <li>Selecciona la que <strong>mejor describa la realidad actual</strong> de tu facility.</li>
+          <li>Pasa a la siguiente dimensión con <strong>Siguiente</strong>; puedes volver con <strong>Anterior</strong>.</li>
+          <li>Todas las preguntas son <strong>obligatorias</strong> para calcular el resultado.</li>
+          <li>Tiempo estimado: <strong>menos de 10 minutos</strong>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Qué Recibes al Final</h3>
+      <div class="modal-section-body">
+        <ul>
+          <li><strong>Score total (0-100)</strong> y <strong>percentil global</strong> vs industria.</li>
+          <li>Desglose por dimensión con tu <strong>punto débil principal</strong>.</li>
+          <li><strong>Perfil de fricción</strong> personalizado (ej. "Operador a ciegas", "El apagafuegos", etc.).</li>
+          <li>Recomendación concreta: <strong>qué hace el cuartil superior</strong> en tu dimensión débil.</li>
+          <li>Botón para <strong>descargar PDF</strong> del reporte completo.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Metodología del Percentil</h3>
+      <div class="modal-section-body">
+        Tu posición se calcula contra una <strong>distribución mixta dinámica</strong>:
+        <ul>
+          <li>Base pública: Uptime Institute, Gartner, Lawrence Berkeley National Lab.</li>
+          <li>Datos primarios: respuestas reales acumuladas en este benchmark (anónimas).</li>
+          <li>Fórmula de mezcla: <code>peso_primario = N / (N + K)</code> con <code>K = 50</code>.</li>
+          <li>Con N=0 → 100% público; N=50 → 50/50; N=200 → 80% primario.</li>
+        </ul>
+        El percentil indica qué porcentaje de la distribución de referencia supera tu score.
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3 class="modal-section-title">Privacidad y Datos</h3>
+      <div class="modal-section-body">
+        <ul>
+          <li>Respuestas <strong>100% anónimas</strong> — no se solicitan datos identificatorios.</li>
+          <li>Se almacenan solo para <strong>mejorar la distribución de referencia</strong> (rebalanceo dinámico).</li>
+          <li>El <a href="/dashboard" style="color: var(--orange);" target="_blank">dashboard público</a> muestra solo estadísticas agregadas.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeInstructions()">Entendido, empezar →</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

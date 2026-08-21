@@ -1,10 +1,12 @@
 import sqlite3
 from pathlib import Path
+from datetime import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
+from fpdf import FPDF
 
 import sys
 sys.path.insert(0, str(Path(__file__).parent / "src"))
@@ -148,6 +150,90 @@ def get_submissions():
     return {"total_records": len(rows), "data": [dict(r) for r in rows]}
 
 
+@app.get("/api/v1/dashboard/stats")
+def get_dashboard_stats():
+    """Estadísticas agregadas del dataset para el dashboard público."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute("SELECT * FROM responses").fetchall()
+    conn.close()
+
+    if not rows:
+        return {
+            "total_responses": 0,
+            "score_promedio": 0,
+            "score_mediano": 0,
+            "percentil_promedio": 0,
+            "dimension_mas_debil_comun": None,
+            "perfil_mas_comun": None,
+            "distribucion_scores": {},
+            "distribucion_perfiles": {},
+            "distribucion_dimensiones_debiles": {},
+            "peso_primario_actual": 0,
+        }
+
+    data = [dict(r) for r in rows]
+    total = len(data)
+
+    scores = [r["score_total"] for r in data]
+    percentiles = [r["percentil_global"] for r in data]
+
+    score_promedio = round(sum(scores) / total, 1)
+    score_mediano = round(sorted(scores)[total // 2], 1)
+    percentil_promedio = round(sum(percentiles) / total, 1)
+
+    from collections import Counter
+    dim_counter = Counter(r["dimension_mas_debil"] for r in data)
+    perfil_counter = Counter(r["nombre_perfil"] for r in data)
+
+    dimension_mas_debil_comun = dim_counter.most_common(1)[0][0] if dim_counter else None
+    perfil_mas_comun = perfil_counter.most_common(1)[0][0] if perfil_counter else None
+
+    distribucion_scores = {
+        "0-20": sum(1 for s in scores if s < 20),
+        "20-40": sum(1 for s in scores if 20 <= s < 40),
+        "40-60": sum(1 for s in scores if 40 <= s < 60),
+        "60-80": sum(1 for s in scores if 60 <= s < 80),
+        "80-100": sum(1 for s in scores if s >= 80),
+    }
+
+    LABELS = {
+        "visibilidad_cross_layer": "Visibilidad Cross-Layer",
+        "atribucion_friccion": "Atribución de Fricción",
+        "latencia_coordinacion": "Latencia de Coordinación",
+        "auto_cuantificacion": "Auto-Cuantificación",
+        "bloqueantes": "Bloqueantes",
+    }
+
+    return {
+        "total_responses": total,
+        "score_promedio": score_promedio,
+        "score_mediano": score_mediano,
+        "percentil_promedio": percentil_promedio,
+        "dimension_mas_debil_comun": {
+            "clave": dimension_mas_debil_comun,
+            "label": LABELS.get(dimension_mas_debil_comun, dimension_mas_debil_comun),
+            "count": dim_counter.get(dimension_mas_debil_comun, 0),
+        } if dimension_mas_debil_comun else None,
+        "perfil_mas_comun": {
+            "nombre": perfil_mas_comun,
+            "count": perfil_counter.get(perfil_mas_comun, 0),
+        } if perfil_mas_comun else None,
+        "distribucion_scores": distribucion_scores,
+        "distribucion_perfiles": dict(perfil_counter),
+        "distribucion_dimensiones_debiles": {LABELS.get(k, k): v for k, v in dim_counter.items()},
+        "peso_primario_actual": round(data[-1].get("peso_primario_actual", 0) if data else 0, 2) if data else 0,
+    }
+
+
+@app.get("/dashboard")
+def dashboard():
+    index = STATIC_DIR / "dashboard.html"
+    if index.exists():
+        return FileResponse(str(index))
+    return {"status": "ok", "message": "Dashboard no disponible. Crea static/dashboard.html"}
+
+
 @app.get("/api/v1/report/{submission_id}")
 def get_report(submission_id: int):
     """
@@ -210,3 +296,157 @@ def get_report(submission_id: int):
             },
         }
     }
+
+
+class PDFReport(FPDF):
+    def __init__(self):
+        super().__init__()
+        self.set_auto_page_break(auto=True, margin=20)
+
+    def header(self):
+        self.set_font("Helvetica", "B", 16)
+        self.set_text_color(249, 115, 22)
+        self.cell(0, 12, "Benchmark de Madurez - Data Centers", align="C", new_x="LMARGIN", new_y="NEXT")
+        self.set_draw_color(249, 115, 22)
+        self.line(10, self.get_y(), 200, self.get_y())
+        self.ln(8)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font("Helvetica", "I", 8)
+        self.set_text_color(128, 128, 128)
+        self.cell(0, 10, f"Pagina {self.page_no()}/{{nb}}", align="C")
+
+    def section_title(self, title):
+        self.set_font("Helvetica", "B", 13)
+        self.set_text_color(40, 40, 40)
+        self.cell(0, 10, title, new_x="LMARGIN", new_y="NEXT")
+        self.set_draw_color(200, 200, 200)
+        self.line(10, self.get_y(), 200, self.get_y())
+        self.ln(4)
+
+    def body_text(self, text):
+        self.set_font("Helvetica", "", 10)
+        self.set_text_color(60, 60, 60)
+        self.multi_cell(0, 5, text)
+        self.ln(2)
+
+    def kv_pair(self, key, value):
+        self.set_font("Helvetica", "B", 10)
+        self.set_text_color(60, 60, 60)
+        self.cell(60, 6, key)
+        self.set_font("Helvetica", "", 10)
+        self.cell(0, 6, str(value), new_x="LMARGIN", new_y="NEXT")
+
+    def score_bar(self, label, score, is_weak=False):
+        self.set_font("Helvetica", "B", 10)
+        self.set_text_color(249, 115, 22) if is_weak else self.set_text_color(60, 60, 60)
+        self.cell(70, 6, label)
+        self.set_font("Helvetica", "", 10)
+        self.set_text_color(60, 60, 60)
+        bar_width = int(score * 1.2)
+        self.cell(bar_width, 6, "", fill=True)
+        self.cell(0, 6, f" {score:.1f}", new_x="LMARGIN", new_y="NEXT")
+        self.set_fill_color(249, 115, 22)
+
+
+def generate_pdf_report(row: dict, scores: dict, perfil: dict, submission_id: int) -> bytes:
+    pdf = PDFReport()
+    pdf.alias_nb_pages()
+    pdf.add_page()
+
+    LABELS = {
+        "visibilidad_cross_layer": "Visibilidad Cross-Layer",
+        "atribucion_friccion":     "Atribución de Fricción",
+        "latencia_coordinacion":   "Latencia de Coordinación",
+        "auto_cuantificacion":     "Auto-Cuantificación",
+        "bloqueantes":             "Bloqueantes",
+    }
+
+    pdf.set_font("Helvetica", "B", 14)
+    pdf.set_text_color(40, 40, 40)
+    pdf.cell(0, 10, "Reporte de Benchmark de Madurez Operacional", align="C", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(4)
+
+    pdf.kv_pair("ID de Submission:", submission_id)
+    pdf.kv_pair("Fecha:", row["created_at"])
+    pdf.ln(4)
+
+    pdf.section_title("1. Resumen Ejecutivo")
+    pdf.kv_pair("Score Total:", f"{row['score_total']:.1f} / 100")
+    pdf.kv_pair("Percentil Global:", f"{row['percentil_global']:.1f}%")
+    pdf.body_text(f"Tu facility supera al {row['percentil_global']:.0f}% de los operadores de la industria.")
+    pdf.ln(2)
+
+    pdf.section_title("2. Desglose por Dimensión")
+    for dim_key, label in LABELS.items():
+        score = scores["scores_por_dimension"][dim_key]
+        is_weak = dim_key == row["dimension_mas_debil"]
+        pdf.set_font("Helvetica", "B" if is_weak else "", 10)
+        pdf.set_text_color(249, 115, 22) if is_weak else pdf.set_text_color(60, 60, 60)
+        pdf.cell(70, 6, f"{label}{' *' if is_weak else ''}")
+        pdf.set_font("Helvetica", "", 10)
+        pdf.set_text_color(60, 60, 60)
+        bar_width = int(score * 1.2)
+        pdf.set_fill_color(249, 115, 22)
+        pdf.cell(bar_width, 6, "", fill=True)
+        pdf.cell(0, 6, f" {score:.1f}", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
+    pdf.set_font("Helvetica", "I", 9)
+    pdf.set_text_color(128, 128, 128)
+    pdf.cell(0, 5, "* Dimensión más débil (punto de fricción principal)", new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(4)
+
+    pdf.section_title("3. Perfil de Fricción Principal")
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_text_color(40, 40, 40)
+    pdf.cell(0, 8, perfil["nombre_perfil"], new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
+    pdf.body_text(perfil["descripcion_problema"])
+    pdf.ln(2)
+
+    pdf.section_title("4. Qué Hace Diferente el Cuartil Superior")
+    pdf.body_text(perfil["cuartil_superior"])
+    pdf.ln(4)
+
+    pdf.section_title("5. Contexto del Dataset")
+    n_total = get_n_responses()
+    pdf.kv_pair("Total de respuestas en el dataset:", n_total)
+    pdf.body_text(
+        "Tu posición se calcula contra una distribución que combina "
+        "datos de la industria (Uptime Institute, Gartner) con las "
+        "respuestas acumuladas en este benchmark. El rebalanceo dinámico "
+        "ajusta el peso de los datos propios conforme crece la muestra."
+    )
+
+    # fpdf2 output(dest='S') returns bytes/bytearray directly, avoiding temp file issues on Windows
+    pdf_bytes = pdf.output(dest='S')
+    if isinstance(pdf_bytes, str):
+        pdf_bytes = pdf_bytes.encode('latin-1')
+    elif isinstance(pdf_bytes, bytearray):
+        pdf_bytes = bytes(pdf_bytes)
+    return pdf_bytes
+
+
+@app.get("/api/v1/report/{submission_id}/pdf")
+def download_report_pdf(submission_id: int):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM responses WHERE id = ?", (submission_id,)).fetchone()
+    conn.close()
+
+    if not row:
+        raise HTTPException(status_code=404, detail=f"Submission {submission_id} no encontrada.")
+
+    row = dict(row)
+    respuestas = {f"P{i}": row[f"p{i}"] for i in range(1, 13)}
+    scores = calculate_scores(respuestas)
+    perfil = get_qualitative_output(row["dimension_mas_debil"])
+
+    pdf_bytes = generate_pdf_report(row, scores, perfil, submission_id)
+
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=benchmark_report_{submission_id}.pdf"}
+    )
