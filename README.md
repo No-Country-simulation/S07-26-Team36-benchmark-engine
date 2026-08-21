@@ -250,6 +250,3 @@ S07-26-Team36-benchmark-engine/
 
 ---
 
-## Licencia
-
-Proyecto académico — Sprint 7, TripleTen / No Country Simulation.
